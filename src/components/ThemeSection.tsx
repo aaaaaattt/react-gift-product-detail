@@ -2,11 +2,9 @@ import type { Theme } from "@emotion/react";
 import { css } from "@emotion/react";
 import { useTheme } from "@emotion/react";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-
-const themeURL = import.meta.env.VITE_API_BASE_URL_THEME;
+import { api } from "@/libs/axios";
 
 type ThemeItem = {
   themeId: string;
@@ -20,11 +18,12 @@ const ThemeSection = () => {
   const [isThemeLoading, setIsThemeLoading] = useState(true);
   const [isThemeError, setIsThemeError] = useState(false);
   const navigate = useNavigate();
+  const THEMES = "/themes";
 
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        const response = await axios.get(themeURL);
+        const response = await api.get(THEMES);
         setThemeData(response.data.data);
         setIsThemeLoading(false);
       } catch (error) {
