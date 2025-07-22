@@ -102,7 +102,7 @@ const Order: React.FC = () => {
   };
 
   const { user } = useUserInfo();
-  const orderURL = import.meta.env.VITE_API_BASE_URL_ORDER;
+  const ORDER = "/order";
 
   const { fetchData } = useRequestHandler();
 
@@ -214,8 +214,8 @@ const Order: React.FC = () => {
           onClick={async () => {
             handleSubmit();
             try {
-              await axios.post(
-                orderURL,
+              await api.post(
+                ORDER,
                 {
                   productId: Number(productId),
                   message: GiftMessageRef.current?.value,
