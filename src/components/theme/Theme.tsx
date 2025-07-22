@@ -8,6 +8,7 @@ import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
+import { api } from "@/libs/axios";
 
 type ThemeInfo = {
   name: string;
@@ -75,9 +76,7 @@ const ThemePage = () => {
     setIsLoading(true);
     fetchData({
       fetcher: () =>
-        axios.get(
-          `${import.meta.env.VITE_API_BASE_URL_THEME}/${themeId}/products?cursor=${cursor}&limit=10`
-        ),
+        api.get(`/themes/${themeId}/products?cursor=${cursor}&limit=10`),
       onSuccess: (data) => {
         const newProducts = data.data.data.list;
         setProductList((prev) => [...prev, ...newProducts]);
@@ -99,9 +98,7 @@ const ThemePage = () => {
   useEffect(() => {
     fetchData({
       fetcher: () =>
-        axios.get(
-          `${import.meta.env.VITE_API_BASE_URL_THEME}/${themeId}/info?cursor=${cursor}&limit=10`
-        ),
+        api.get(`/themes/${themeId}/info?cursor=${cursor}&limit=10`),
       onSuccess: (data) => {
         setThemeInfo(data.data.data);
       },
@@ -116,10 +113,7 @@ const ThemePage = () => {
     });
 
     fetchData({
-      fetcher: () =>
-        axios.get(
-          `${import.meta.env.VITE_API_BASE_URL_THEME}/${themeId}/products `
-        ),
+      fetcher: () => api.get(`/themes/${themeId}/products `),
       onSuccess: (data) => {
         setProductInfo(data.data.data);
       },
