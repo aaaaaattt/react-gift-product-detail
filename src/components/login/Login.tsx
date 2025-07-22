@@ -1,7 +1,7 @@
 import type { Theme } from "@emotion/react";
 import { useTheme } from "@emotion/react";
 import { css } from "@emotion/react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import Input from "@/components/login/Input";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useValidate } from "@/components/login/useValidate";

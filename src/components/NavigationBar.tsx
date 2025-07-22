@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 import type { Theme } from "@emotion/react";
 import { IoArrowBackOutline, IoPersonOutline } from "react-icons/io5";
 import { useTheme } from "@emotion/react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 
 const NavigationBar = () => {
