@@ -3,11 +3,9 @@ import { css } from "@emotion/react";
 import GiftObject from "./GiftObject";
 import { useTheme } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
-
-const productRankingURL = import.meta.env.VITE_API_BASE_URL_PRODUCT_RANKING;
+import { api } from "@/libs/axios";
 
 type ProductRanking = {
   id: number;
@@ -44,7 +42,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
   useEffect(() => {
     const fetchProductRanking = async () => {
       try {
-        const response = await axios.get(sortParam);
+        const response = await api.get(sortParam);
         setProductRankingData(response.data.data);
       } catch (error) {
         console.error("Error fetching theme data:", error);
