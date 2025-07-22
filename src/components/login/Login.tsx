@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 import Input from "@/components/login/Input";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useValidate } from "@/components/login/useValidate";
-import axios from "axios";
 import { STORAGE_KEYS } from "@/constants/storageKyes";
 import { useRequestHandler } from "@/hooks/useRequestHandler";
 import { ROUTE_PATHS } from "@/constants/routePath";
+import { api } from "@/libs/axios";
 
-const loginURL = import.meta.env.VITE_API_BASE_URL_LOGIN;
+const LOGIN = "/login";
 
 const Login = () => {
   const { setUser } = useUserInfo();
@@ -59,8 +59,8 @@ const Login = () => {
           if (isFormValid) {
             fetchData({
               fetcher: () =>
-                axios.post(
-                  loginURL,
+                api.post(
+                  LOGIN,
                   {
                     email: email.string,
                     password: password.string,
