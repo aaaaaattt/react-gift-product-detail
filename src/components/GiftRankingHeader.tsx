@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import type { Theme } from "@emotion/react";
 import { useTheme } from "@emotion/react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
 
 type GiftRankingHeaderProps = {
@@ -23,32 +23,27 @@ const GiftRankingHeader: React.FC<GiftRankingHeaderProps> = ({
   const theme = useTheme();
   const location = useLocation();
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
     const initTarget = searchParams.get("target") || "ALL";
     const initRank = (searchParams.get("rankType") as RANK_TYPE) || "MANY_WISH";
     setTarget(initTarget);
     setRankType(initRank);
-    const params = new URLSearchParams(location.search);
-    params.set("target", initTarget);
-    params.set("rankType", initRank);
-    navigate(`${location.pathname}?${params.toString()}`);
   }, [location.pathname, location.search, navigate, setRankType, setTarget]);
 
   const handleTargetClick = (newTarget: string) => {
     setTarget(newTarget);
-    const params = new URLSearchParams(location.search);
-    params.set("target", newTarget);
-    params.set("rankType", rankType);
-    navigate(`${location.pathname}?${params.toString()}`);
+    searchParams.set("target", newTarget);
+    searchParams.set("rankType", rankType);
+    setSearchParams(searchParams);
   };
 
   const handleRankClick = (newRank: string) => {
     setRankType(newRank);
-    const params = new URLSearchParams(location.search);
-    params.set("target", target);
-    params.set("rankType", newRank);
-    navigate(`${location.pathname}?${params.toString()}`);
+    searchParams.set("target", target);
+    searchParams.set("rankType", newRank);
+    setSearchParams(searchParams);
   };
 
   return (
