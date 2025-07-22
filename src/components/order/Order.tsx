@@ -32,6 +32,7 @@ import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useRequestHandler } from "@/hooks/useRequestHandler";
 import { ROUTE_PATHS } from "@/constants/routePath";
+import { api } from "@/libs/axios";
 
 type Product = {
   id: number;
@@ -108,10 +109,7 @@ const Order: React.FC = () => {
   useEffect(() => {
     if (!productId) return;
     fetchData({
-      fetcher: () =>
-        axios.get(
-          `${import.meta.env.VITE_API_BASE_URL_PRODUCT}/${productId}/summary`
-        ),
+      fetcher: () => api.get(`/products/${productId}/summary`),
       onSuccess: (data) => {
         setProduct(data.data.data);
       },
