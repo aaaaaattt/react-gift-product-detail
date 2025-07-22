@@ -36,8 +36,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  const sortParam =
-    productRankingURL + `?targetType=${target}&rankType=${rankType}`;
+  const sortParam = `/products/ranking?targetType=${target}&rankType=${rankType}`;
 
   useEffect(() => {
     const fetchProductRanking = async () => {
