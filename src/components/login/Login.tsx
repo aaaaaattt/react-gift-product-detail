@@ -6,9 +6,9 @@ import Input from "@/components/login/Input";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { useValidate } from "@/components/login/useValidate";
 import { STORAGE_KEYS } from "@/constants/storageKyes";
-import { useRequestHandler } from "@/hooks/useRequestHandler";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import { api } from "@/libs/axios";
+import { useMutation } from "@tanstack/react-query";
 
 const LOGIN = "/login";
 
@@ -30,7 +30,37 @@ const Login = () => {
   const email = useValidate(validateEmail, "이메일 형식을 지켜주세요.");
   const password = useValidate(validatePassword, "비밀번호는 8자 이상입니다.");
   const isFormValid = email.isValid && password.isValid;
-  const { fetchData } = useRequestHandler();
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      api.post(
+        LOGIN,
+        {
+          email: email.string,
+          password: password.string,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      ),
+    onSuccess: (response: any) => {
+      const logUserInfo = {
+        email: response.data.data.email,
+        name: response.data.data.name,
+        authToken: response.data.data.authToken,
+      };
+
+      setUser(logUserInfo);
+      sessionStorage.setItem(
+        STORAGE_KEYS.USER_INFO,
+        JSON.stringify(logUserInfo)
+      );
+
+      navigate(MYPAGE);
+    },
+  });
 
   return (
     <div css={containerStyle()}>
@@ -57,36 +87,7 @@ const Login = () => {
       <button
         onClick={async () => {
           if (isFormValid) {
-            fetchData({
-              fetcher: () =>
-                api.post(
-                  LOGIN,
-                  {
-                    email: email.string,
-                    password: password.string,
-                  },
-                  {
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                ),
-              onSuccess: (response: any) => {
-                const logUserInfo = {
-                  email: response.data.data.email,
-                  name: response.data.data.name,
-                  authToken: response.data.data.authToken,
-                };
-
-                setUser(logUserInfo);
-                sessionStorage.setItem(
-                  STORAGE_KEYS.USER_INFO,
-                  JSON.stringify(logUserInfo)
-                );
-
-                navigate(MYPAGE);
-              },
-            });
+            mutation.mutate();
           }
         }}
         css={buttonStyle(theme, isFormValid)}
