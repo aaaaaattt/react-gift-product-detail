@@ -1,6 +1,6 @@
 import { useRequestHandler } from "@/hooks/useRequestHandler";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import theme from "@/styles/theme";
@@ -49,6 +49,34 @@ const ThemePage = () => {
 
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  const loadProducts = useCallback(
+    (cursor: number) => {
+      if (isLoading || !hasMore) return;
+
+      setIsLoading(true);
+      fetchData({
+        fetcher: () =>
+          api.get(`/themes/${themeId}/products?cursor=${cursor}&limit=10`),
+        onSuccess: (data) => {
+          const newProducts = data.data.data.list;
+          setProductList((prev) => [...prev, ...newProducts]);
+
+          if (newProducts.length < 10) {
+            setHasMore(false);
+          } else {
+            setCursor(cursor + newProducts.length);
+          }
+
+          setIsLoading(false);
+        },
+        onError: () => {
+          setIsLoading(false);
+        },
+      });
+    },
+    [fetchData, hasMore, isLoading, themeId]
+  );
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -68,32 +96,7 @@ const ThemePage = () => {
         observer.unobserve(observerRef.current);
       }
     };
-  }, [cursor, hasMore, isLoading]);
-
-  const loadProducts = (cursor: number) => {
-    if (isLoading || !hasMore) return;
-
-    setIsLoading(true);
-    fetchData({
-      fetcher: () =>
-        api.get(`/themes/${themeId}/products?cursor=${cursor}&limit=10`),
-      onSuccess: (data) => {
-        const newProducts = data.data.data.list;
-        setProductList((prev) => [...prev, ...newProducts]);
-
-        if (newProducts.length < 10) {
-          setHasMore(false);
-        } else {
-          setCursor(cursor + newProducts.length);
-        }
-
-        setIsLoading(false);
-      },
-      onError: () => {
-        setIsLoading(false);
-      },
-    });
-  };
+  }, [cursor, hasMore, isLoading, loadProducts]);
 
   useEffect(() => {
     fetchData({
@@ -119,7 +122,7 @@ const ThemePage = () => {
       },
     });
     loadProducts(0);
-  }, [themeId]);
+  }, [MAIN, cursor, fetchData, loadProducts, navigate, themeId]);
 
   if (!themeInfo || !productInfo) {
     return (
