@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { api } from "@/libs/axios";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 type ProductRanking = {
   id: number;
@@ -34,27 +36,30 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
     ProductRanking[] | null
   >(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const productsFiltered = `/products/ranking?targetType=${target}&rankType=${rankType}`;
+  const navigate = useNavigate();
 
-  const sortParam = `/products/ranking?targetType=${target}&rankType=${rankType}`;
+  const { data, error, isError } = useQuery({
+    queryKey: ["productRanking", target, rankType],
+    queryFn: () => api.get(productsFiltered),
+    enabled: !!target && !!rankType,
+    select: (data) => data.data.data,
+  });
 
   useEffect(() => {
-    const fetchProductRanking = async () => {
-      try {
-        const response = await api.get(sortParam);
-        setProductRankingData(response.data.data);
-      } catch (error) {
-        console.error("Error fetching theme data:", error);
-        setIsError(true);
-      } finally {
+    if (isError) {
+      if (axios.isAxiosError(error)) {
         setIsLoading(false);
+        return;
       }
-    };
+    }
 
-    fetchProductRanking();
-  }, [sortParam]);
+    if (data) {
+      setProductRankingData(data);
+      setIsLoading(false);
+    }
+  }, [target, rankType, data, error, isError]);
 
-  const navigate = useNavigate();
   return (
     <div css={giftRankingStyle(theme)}>
       {isError && <div>상품 목록이 없습니다.</div>}
