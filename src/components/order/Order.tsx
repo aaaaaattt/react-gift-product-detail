@@ -96,7 +96,6 @@ const Order: React.FC = () => {
   const { user } = useUserInfo();
   const ORDER = "/order";
 
-  // useQuery 적용(1)
   const {
     data: product,
     error,
@@ -107,8 +106,6 @@ const Order: React.FC = () => {
     enabled: !!productId,
     select: (data) => data.data.data,
   });
-
-  console.log("product", product);
 
   if (isError) {
     if (axios.isAxiosError(error)) {
