@@ -28,8 +28,6 @@ const ThemeSection = () => {
     select: (data) => data.data.data,
   });
 
-  console.log("themeData", themeData);
-
   return (
     <div css={categoryStyle(theme)}>
       {isThemeError ? (
