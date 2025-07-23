@@ -93,7 +93,6 @@ const Order: React.FC = () => {
     navigate(MAIN);
   };
 
-  const queryClient = new QueryClient();
   const { user } = useUserInfo();
   const ORDER = "/order";
 
