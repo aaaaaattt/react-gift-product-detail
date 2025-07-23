@@ -1,10 +1,10 @@
 import type { Theme } from "@emotion/react";
 import { css } from "@emotion/react";
 import { useTheme } from "@emotion/react";
-import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import { api } from "@/libs/axios";
+import { useQuery } from "@tanstack/react-query";
 
 type ThemeItem = {
   themeId: string;
@@ -14,27 +14,21 @@ type ThemeItem = {
 
 const ThemeSection = () => {
   const theme = useTheme();
-  const [themeData, setThemeData] = useState<ThemeItem[] | null>(null);
-  const [isThemeLoading, setIsThemeLoading] = useState(true);
-  const [isThemeError, setIsThemeError] = useState(false);
   const navigate = useNavigate();
   const THEMES = "/themes";
 
-  useEffect(() => {
-    const fetchTheme = async () => {
-      try {
-        const response = await api.get(THEMES);
-        setThemeData(response.data.data);
-        setIsThemeLoading(false);
-      } catch (error) {
-        console.error("Error fetching theme data:", error);
-        setIsThemeError(true);
-        setIsThemeLoading(false);
-      }
-    };
+  const {
+    data: themeData,
+    isError: isThemeError,
+    isLoading: isThemeLoading,
+  } = useQuery({
+    queryKey: ["themeData"],
+    queryFn: () => api.get(THEMES),
+    enabled: !!data,
+    select: (data) => data.data.data,
+  });
 
-    fetchTheme();
-  }, []);
+  console.log("themeData", themeData);
 
   return (
     <div css={categoryStyle(theme)}>
@@ -46,7 +40,7 @@ const ThemeSection = () => {
         </div>
       ) : (
         themeData &&
-        themeData.map((themeInfo) => (
+        themeData.map((themeInfo: ThemeItem) => (
           <div
             onClick={() => navigate(`THEME/${themeInfo.themeId}`)}
             css={categoryItemStyle(theme)}
