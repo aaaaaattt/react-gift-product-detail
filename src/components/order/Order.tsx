@@ -32,7 +32,7 @@ import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import { api } from "@/libs/axios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, QueryClient } from "@tanstack/react-query";
 
 const Order: React.FC = () => {
   const theme = useTheme();
@@ -93,6 +93,7 @@ const Order: React.FC = () => {
     navigate(MAIN);
   };
 
+  const queryClient = new QueryClient();
   const { user } = useUserInfo();
   const ORDER = "/order";
 
@@ -112,6 +113,34 @@ const Order: React.FC = () => {
       navigate(LOGIN);
     }
   }
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      api.post(
+        ORDER,
+        {
+          productId: Number(productId),
+          message: GiftMessageRef.current?.value,
+          messageCardId: String(selectedId),
+          ordererName: SenderNameRef.current?.value,
+          receivers: renewedReceivers,
+        },
+        {
+          headers: {
+            Authorization: user?.authToken,
+          },
+        }
+      ),
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          navigate(LOGIN);
+        } else {
+          alert("주문에 실패했습니다. 다시 시도해주세요.");
+        }
+      }
+    },
+  });
 
   const renewedReceivers = receivers.map((receiver) => ({
     name: receiver.receiverName,
@@ -205,29 +234,7 @@ const Order: React.FC = () => {
         <div
           onClick={async () => {
             handleSubmit();
-            try {
-              await api.post(
-                ORDER,
-                {
-                  productId: Number(productId),
-                  message: GiftMessageRef.current?.value,
-                  messageCardId: String(selectedId),
-                  ordererName: SenderNameRef.current?.value,
-                  receivers: renewedReceivers,
-                },
-                {
-                  headers: {
-                    Authorization: user?.authToken,
-                  },
-                }
-              );
-            } catch (error) {
-              if (axios.isAxiosError(error)) {
-                if (error.response?.status === 401) {
-                  navigate(LOGIN);
-                }
-              }
-            }
+            mutation.mutate();
           }}
           css={totalPriceBoxStyle}
         >
