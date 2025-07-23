@@ -32,7 +32,7 @@ import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import { api } from "@/libs/axios";
-import { useMutation, useQuery, QueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 const Order: React.FC = () => {
   const theme = useTheme();
