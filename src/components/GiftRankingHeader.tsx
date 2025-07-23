@@ -30,7 +30,14 @@ const GiftRankingHeader: React.FC<GiftRankingHeaderProps> = ({
     const initRank = (searchParams.get("rankType") as RANK_TYPE) || "MANY_WISH";
     setTarget(initTarget);
     setRankType(initRank);
-  }, [location.pathname, location.search, navigate, setRankType, setTarget]);
+  }, [
+    location.pathname,
+    location.search,
+    navigate,
+    searchParams,
+    setRankType,
+    setTarget,
+  ]);
 
   const handleTargetClick = (newTarget: string) => {
     setTarget(newTarget);
