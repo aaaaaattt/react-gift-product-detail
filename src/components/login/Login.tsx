@@ -45,7 +45,7 @@ const Login = () => {
           },
         }
       ),
-    onSuccess: (response: any) => {
+    onSuccess: (response) => {
       const logUserInfo = {
         email: response.data.data.email,
         name: response.data.data.name,
