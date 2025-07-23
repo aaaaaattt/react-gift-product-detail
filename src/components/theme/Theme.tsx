@@ -78,6 +78,8 @@ const ThemePage = () => {
   );
 
   useEffect(() => {
+    const targetNode = observerRef.current;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && hasMore && !isLoading) {
@@ -87,13 +89,13 @@ const ThemePage = () => {
       { threshold: 1.0 }
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
+    if (targetNode) {
+      observer.observe(targetNode);
     }
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
+      if (targetNode) {
+        observer.unobserve(targetNode);
       }
     };
   }, [cursor, hasMore, isLoading, loadProducts]);
