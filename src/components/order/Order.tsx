@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { cardData } from "@/data/cardData";
 import { useTheme } from "@emotion/react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,17 +30,9 @@ import type { Theme } from "@emotion/react";
 import ReceiverInfoTable from "@/components/order/ReceiverInfoTable";
 import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { useRequestHandler } from "@/hooks/useRequestHandler";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import { api } from "@/libs/axios";
-
-type Product = {
-  id: number;
-  name: string;
-  brandName: string;
-  price: number;
-  imageURL: string;
-};
+import { useQuery } from "@tanstack/react-query";
 
 const Order: React.FC = () => {
   const theme = useTheme();
@@ -54,7 +46,7 @@ const Order: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [receivers, setReceivers] = useState<FormData["order"]>([]);
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
+
   const { MAIN, LOGIN } = ROUTE_PATHS;
 
   const totalQuantity =
@@ -104,22 +96,25 @@ const Order: React.FC = () => {
   const { user } = useUserInfo();
   const ORDER = "/order";
 
-  const { fetchData } = useRequestHandler();
+  // useQuery 적용(1)
+  const {
+    data: product,
+    error,
+    isError,
+  } = useQuery({
+    queryKey: ["productData", productId],
+    queryFn: () => api.get(`/products/${productId}/summary`),
+    enabled: !!productId,
+    select: (data) => data.data.data,
+  });
 
-  useEffect(() => {
-    if (!productId) return;
-    fetchData({
-      fetcher: () => api.get(`/products/${productId}/summary`),
-      onSuccess: (data) => {
-        setProduct(data.data.data);
-      },
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
-          navigate(LOGIN);
-        }
-      },
-    });
-  }, [productId]);
+  console.log("product", product);
+
+  if (isError) {
+    if (axios.isAxiosError(error)) {
+      navigate(LOGIN);
+    }
+  }
 
   const renewedReceivers = receivers.map((receiver) => ({
     name: receiver.receiverName,
