@@ -33,6 +33,7 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import { api } from "@/libs/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { getProductsSummary } from "@/api/order/order";
 
 const Order: React.FC = () => {
   const theme = useTheme();
@@ -102,7 +103,7 @@ const Order: React.FC = () => {
     isError,
   } = useQuery({
     queryKey: ["productData", productId],
-    queryFn: () => api.get(`/products/${productId}/summary`),
+    queryFn: () => getProductsSummary(productId as string),
     enabled: !!productId,
     select: (data) => data.data.data,
   });
