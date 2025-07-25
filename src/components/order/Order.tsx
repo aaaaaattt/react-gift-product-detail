@@ -38,7 +38,9 @@ const Order: React.FC = () => {
   const theme = useTheme();
   const [selectedId, setSelectedId] = useState<number>();
   const { productId } = useParams<{ productId: string }>();
-  const SenderNameRef = useRef<HTMLInputElement>(null);
+  const SenderNameRef = useRef<HTMLInputElement>(
+    null
+  ) as React.RefObject<HTMLInputElement>;
   const GiftMessageRef = useRef<HTMLTextAreaElement>(null);
   const [messageError, setMessageError] = useState("");
   const [senderError, setSenderError] = useState("");
