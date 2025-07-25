@@ -2,7 +2,7 @@ import type { Theme } from "@emotion/react";
 import { css } from "@emotion/react";
 import { useTheme } from "@emotion/react";
 import { ClipLoader } from "react-spinners";
-import { data, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { api } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 
@@ -24,7 +24,6 @@ const ThemeSection = () => {
   } = useQuery({
     queryKey: ["themeData"],
     queryFn: () => api.get(THEMES),
-    enabled: !!data,
     select: (data) => data.data.data,
   });
 
