@@ -7,10 +7,8 @@ import { useUserInfo } from "@/hooks/useUserInfo";
 import { useValidate } from "@/components/login/useValidate";
 import { STORAGE_KEYS } from "@/constants/storageKyes";
 import { ROUTE_PATHS } from "@/constants/routePath";
-import { api } from "@/libs/axios";
 import { useMutation } from "@tanstack/react-query";
-
-const LOGIN = "/login";
+import { login } from "@/api/login/auth";
 
 const Login = () => {
   const { setUser } = useUserInfo();
@@ -33,18 +31,10 @@ const Login = () => {
 
   const mutation = useMutation({
     mutationFn: () =>
-      api.post(
-        LOGIN,
-        {
-          email: email.string,
-          password: password.string,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      ),
+      login({
+        email: email.string,
+        password: password.string,
+      }),
     onSuccess: (response) => {
       const logUserInfo = {
         email: response.data.data.email,
