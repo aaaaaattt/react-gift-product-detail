@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
 import { api } from "@/libs/axios";
+import { getThemeProducts } from "@/api/theme/theme";
 
 type ThemeInfo = {
   name: string;
@@ -46,7 +47,6 @@ const ThemePage = () => {
   const [cursor, setCursor] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   const loadProducts = useCallback(
@@ -55,8 +55,7 @@ const ThemePage = () => {
 
       setIsLoading(true);
       fetchData({
-        fetcher: () =>
-          api.get(`/themes/${themeId}/products?cursor=${cursor}&limit=10`),
+        fetcher: () => getThemeProducts(themeId as string, cursor),
         onSuccess: (data) => {
           const newProducts = data.data.data.list;
           setProductList((prev) => [...prev, ...newProducts]);
