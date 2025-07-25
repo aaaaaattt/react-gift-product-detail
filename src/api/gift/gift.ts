@@ -21,4 +21,4 @@ type ProductRanking = {
 };
 
 export const getProductsFiltered = (url: string) =>
-  api.get<BaseResponse<ProductRanking[]>>();
+  api.get<BaseResponse<ProductRanking[]>>(url);
