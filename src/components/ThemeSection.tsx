@@ -3,7 +3,6 @@ import { css } from "@emotion/react";
 import { useTheme } from "@emotion/react";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { api } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
 import { getTheme } from "@/api/theme/theme";
 
