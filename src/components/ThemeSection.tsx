@@ -5,6 +5,7 @@ import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
 import { api } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
+import { getTheme } from "@/api/theme/theme";
 
 type ThemeItem = {
   themeId: string;
@@ -15,7 +16,6 @@ type ThemeItem = {
 const ThemeSection = () => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const THEMES = "/themes";
 
   const {
     data: themeData,
@@ -23,7 +23,7 @@ const ThemeSection = () => {
     isLoading: isThemeLoading,
   } = useQuery({
     queryKey: ["themeData"],
-    queryFn: () => api.get(THEMES),
+    queryFn: () => getTheme(),
     select: (data) => data.data.data,
   });
 
