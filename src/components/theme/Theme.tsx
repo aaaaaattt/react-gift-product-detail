@@ -1,6 +1,6 @@
 import { useRequestHandler } from "@/hooks/useRequestHandler";
 import axios from "axios";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import theme from "@/styles/theme";
@@ -13,6 +13,7 @@ import {
   getThemeProductById,
   getThemeProducts,
 } from "@/api/theme/theme";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 type ThemeInfo = {
   name: string;
@@ -47,64 +48,48 @@ const ThemePage = () => {
   const navigate = useNavigate();
   const { MAIN } = ROUTE_PATHS;
   const [productList, setProductList] = useState<ThemeProducts["list"]>([]);
-  const [cursor, setCursor] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
-  const loadProducts = useCallback(
-    (cursor: number) => {
-      if (isLoading || !hasMore) return;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["getThemeProducts"],
+      queryFn: ({ pageParam = 0 }) =>
+        getThemeProducts(themeId as string, pageParam),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => {
+        const { cursor, hasMoreList } = lastPage.data.data;
+        return hasMoreList ? cursor + 10 : undefined;
+      },
+    });
 
-      setIsLoading(true);
-      fetchData({
-        fetcher: () => getThemeProducts(themeId as string, cursor),
-        onSuccess: (data) => {
-          const newProducts = data.data.data.list;
-          setProductList((prev) => [...prev, ...newProducts]);
-
-          if (newProducts.length < 10) {
-            setHasMore(false);
-          } else {
-            setCursor(cursor + newProducts.length);
-          }
-
-          setIsLoading(false);
-        },
-        onError: () => {
-          setIsLoading(false);
-        },
-      });
-    },
-    [fetchData, hasMore, isLoading, themeId]
-  );
+  useEffect(() => {
+    if (!data) return;
+    setProductList(data.pages.flatMap((page) => page.data.data.list));
+  }, [data]);
 
   useEffect(() => {
     const targetNode = observerRef.current;
+    if (!targetNode) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          loadProducts(cursor);
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
       },
       { threshold: 1.0 }
     );
 
-    if (targetNode) {
-      observer.observe(targetNode);
-    }
+    observer.observe(targetNode);
 
     return () => {
-      if (targetNode) {
-        observer.unobserve(targetNode);
-      }
+      observer.unobserve(targetNode);
     };
-  }, [cursor, hasMore, isLoading, loadProducts]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   useEffect(() => {
     fetchData({
-      fetcher: () => getThemeInfo(themeId as string, cursor),
+      fetcher: () => getThemeInfo(themeId as string),
       onSuccess: (data) => {
         setThemeInfo(data.data.data);
       },
@@ -124,8 +109,7 @@ const ThemePage = () => {
         setProductInfo(data.data.data);
       },
     });
-    loadProducts(0);
-  }, [MAIN, cursor, fetchData, loadProducts, navigate, themeId]);
+  }, [MAIN, navigate, themeId]);
 
   if (!themeInfo || !productInfo) {
     return (
@@ -153,7 +137,7 @@ const ThemePage = () => {
             </strong>
           </div>
         ))}
-        {hasMore && <div ref={observerRef} style={{ height: "1px" }} />}
+        {hasNextPage && <div ref={observerRef} style={{ height: "1px" }} />}
       </div>
     </div>
   );
