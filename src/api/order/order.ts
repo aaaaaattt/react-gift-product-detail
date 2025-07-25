@@ -8,10 +8,14 @@ export const getProductsSummary = (productId: string) =>
 
 export const postOrder = (
   productId: string,
-  GiftMessageRef: any,
+  GiftMessageRef: React.RefObject<HTMLInputElement>,
   selectedId: number,
-  SenderNameRef: any,
-  renewedReceivers: any[],
+  SenderNameRef: React.RefObject<HTMLInputElement>,
+  renewedReceivers: {
+    name: string;
+    address: string;
+    [key: string]: string | number | boolean;
+  }[],
   user: User | null
 ) =>
   api.post(
