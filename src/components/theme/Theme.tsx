@@ -8,7 +8,6 @@ import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
-import { api } from "@/libs/axios";
 import {
   getThemeInfo,
   getThemeProductById,
