@@ -9,7 +9,11 @@ import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
 import { api } from "@/libs/axios";
-import { getThemeInfo, getThemeProducts } from "@/api/theme/theme";
+import {
+  getThemeInfo,
+  getThemeProductById,
+  getThemeProducts,
+} from "@/api/theme/theme";
 
 type ThemeInfo = {
   name: string;
@@ -116,7 +120,7 @@ const ThemePage = () => {
     });
 
     fetchData({
-      fetcher: () => api.get(`/themes/${themeId}/products `),
+      fetcher: () => getThemeProductById(themeId as string),
       onSuccess: (data) => {
         setProductInfo(data.data.data);
       },
