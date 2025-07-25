@@ -4,37 +4,16 @@ import GiftObject from "./GiftObject";
 import { useTheme } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { api } from "@/libs/axios";
 import { useQuery } from "@tanstack/react-query";
-
-type ProductRanking = {
-  id: number;
-  name: string;
-  price: {
-    basicPrice: number;
-    sellingPrice: number;
-    discountRate: number;
-  };
-  imageURL: string;
-  brandInfo: {
-    id: number;
-    name: string;
-    imageURL: string;
-  };
-};
+import { getProductsFiltered } from "@/api/gift/gift";
 
 type GiftRankingProps = {
   target: string;
   rankType: string;
 };
 
-type BaseResponse<T> = {
-  data: T;
-};
-
 const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
   const theme = useTheme();
-
   const productsFiltered = `/products/ranking?targetType=${target}&rankType=${rankType}`;
   const navigate = useNavigate();
 
@@ -44,7 +23,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
     isLoading,
   } = useQuery({
     queryKey: ["productRanking", target, rankType],
-    queryFn: () => api.get<BaseResponse<ProductRanking[]>>(productsFiltered),
+    queryFn: () => getProductsFiltered(productsFiltered),
     enabled: !!target && !!rankType,
     select: (data) => data.data.data,
   });
