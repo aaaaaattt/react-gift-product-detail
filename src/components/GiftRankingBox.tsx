@@ -28,6 +28,10 @@ type GiftRankingProps = {
   rankType: string;
 };
 
+type BaseResponse<T> = {
+  data: T;
+};
+
 const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
   const theme = useTheme();
 
@@ -40,7 +44,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
     isLoading,
   } = useQuery({
     queryKey: ["productRanking", target, rankType],
-    queryFn: () => api.get(productsFiltered),
+    queryFn: () => api.get<BaseResponse<ProductRanking[]>>(productsFiltered),
     enabled: !!target && !!rankType,
     select: (data) => data.data.data,
   });
@@ -56,7 +60,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
       {!isError && !isLoading && (
         <>
           {productRankingData &&
-            productRankingData.map((product: ProductRanking) => (
+            productRankingData.map((product) => (
               <GiftObject
                 key={product.id}
                 gift={product}
