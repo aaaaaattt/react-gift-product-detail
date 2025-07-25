@@ -31,9 +31,8 @@ import ReceiverInfoTable from "@/components/order/ReceiverInfoTable";
 import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { ROUTE_PATHS } from "@/constants/routePath";
-import { api } from "@/libs/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProductsSummary } from "@/api/order/order";
+import { getProductsSummary, postOrder } from "@/api/order/order";
 
 const Order: React.FC = () => {
   const theme = useTheme();
@@ -95,7 +94,6 @@ const Order: React.FC = () => {
   };
 
   const { user } = useUserInfo();
-  const ORDER = "/order";
 
   const {
     data: product,
@@ -116,20 +114,13 @@ const Order: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: () =>
-      api.post(
-        ORDER,
-        {
-          productId: Number(productId),
-          message: GiftMessageRef.current?.value,
-          messageCardId: String(selectedId),
-          ordererName: SenderNameRef.current?.value,
-          receivers: renewedReceivers,
-        },
-        {
-          headers: {
-            Authorization: user?.authToken,
-          },
-        }
+      postOrder(
+        productId as string,
+        GiftMessageRef,
+        selectedId as number,
+        SenderNameRef,
+        renewedReceivers,
+        user
       ),
     onError: (error) => {
       if (axios.isAxiosError(error)) {
