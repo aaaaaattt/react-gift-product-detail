@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
 import { api } from "@/libs/axios";
-import { getThemeProducts } from "@/api/theme/theme";
+import { getThemeInfo, getThemeProducts } from "@/api/theme/theme";
 
 type ThemeInfo = {
   name: string;
@@ -101,8 +101,7 @@ const ThemePage = () => {
 
   useEffect(() => {
     fetchData({
-      fetcher: () =>
-        api.get(`/themes/${themeId}/info?cursor=${cursor}&limit=10`),
+      fetcher: () => getThemeInfo(themeId as string, cursor),
       onSuccess: (data) => {
         setThemeInfo(data.data.data);
       },
