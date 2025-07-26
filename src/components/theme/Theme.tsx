@@ -1,6 +1,6 @@
 import { useRequestHandler } from "@/hooks/useRequestHandler";
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import theme from "@/styles/theme";
@@ -47,7 +47,6 @@ const ThemePage = () => {
   const [productInfo, setProductInfo] = useState<ThemeProducts | null>(null);
   const navigate = useNavigate();
   const { MAIN } = ROUTE_PATHS;
-  const [productList, setProductList] = useState<ThemeProducts["list"]>([]);
   const observerRef = useRef<HTMLDivElement | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -62,9 +61,8 @@ const ThemePage = () => {
       },
     });
 
-  useEffect(() => {
-    if (!data) return;
-    setProductList(data.pages.flatMap((page) => page.data.data.list));
+  const productList = useMemo(() => {
+    data?.pages.flatMap((page) => page.data.data.list);
   }, [data]);
 
   useEffect(() => {
