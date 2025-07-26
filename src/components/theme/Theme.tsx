@@ -61,9 +61,10 @@ const ThemePage = () => {
       },
     });
 
-  const productList = useMemo(() => {
-    data?.pages.flatMap((page) => page.data.data.list);
-  }, [data]);
+  const productList = useMemo(
+    () => data?.pages.flatMap((page) => page.data.data.list) || [],
+    [data]
+  );
 
   useEffect(() => {
     const targetNode = observerRef.current;
