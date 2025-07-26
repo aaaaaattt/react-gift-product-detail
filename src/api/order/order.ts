@@ -3,10 +3,10 @@ import { api } from "@/libs/axios";
 
 const ORDER = "/order";
 
-type Receiver = {
+type renewedReceiver = {
   name: string;
-  phone: string;
-  address: string;
+  phoneNumber: string;
+  quantity: number;
 };
 
 export const getProductsSummary = (productId: string) =>
@@ -16,8 +16,8 @@ export const postOrder = (
   productId: string | undefined,
   GiftMessageRef: React.RefObject<HTMLTextAreaElement | null>,
   selectedId: number,
-  SenderNameRef: React.RefObject<HTMLInputElement>,
-  renewedReceivers: Receiver[],
+  senderName: string | undefined,
+  renewedReceivers: renewedReceiver[],
   user: User | null
 ) =>
   api.post(
@@ -26,7 +26,7 @@ export const postOrder = (
       productId: Number(productId),
       message: GiftMessageRef.current?.value,
       messageCardId: String(selectedId),
-      ordererName: SenderNameRef.current?.value,
+      ordererName: senderName,
       receivers: renewedReceivers,
     },
     {

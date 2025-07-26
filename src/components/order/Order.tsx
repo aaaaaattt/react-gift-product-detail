@@ -38,9 +38,7 @@ const Order: React.FC = () => {
   const theme = useTheme();
   const [selectedId, setSelectedId] = useState<number>();
   const { productId } = useParams<{ productId: string }>();
-  const SenderNameRef = useRef<HTMLInputElement>(
-    null
-  ) as React.RefObject<HTMLInputElement>;
+
   const GiftMessageRef = useRef<HTMLTextAreaElement>(null);
   const [messageError, setMessageError] = useState("");
   const [senderError, setSenderError] = useState("");
@@ -48,6 +46,7 @@ const Order: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [receivers, setReceivers] = useState<FormData["order"]>([]);
   const navigate = useNavigate();
+  const [senderName, setSenderName] = useState("");
 
   const { MAIN, LOGIN } = ROUTE_PATHS;
 
@@ -58,7 +57,7 @@ const Order: React.FC = () => {
 
   const handleSubmit = () => {
     const msg = GiftMessageRef.current?.value.trim() ?? "";
-    const sender = SenderNameRef.current?.value.trim() ?? "";
+    const sender = senderName ?? "";
     const isReceiverExists = receivers.length > 0;
 
     if (sender === "") {
@@ -87,7 +86,7 @@ const Order: React.FC = () => {
 
     alert(
       `주문 상품명: ${product?.name}\n` +
-        `보내는 사람: ${SenderNameRef.current?.value}\n` +
+        `보내는 사람: ${senderName}\n` +
         `메시지: ${GiftMessageRef.current?.value}\n` +
         `받는 사람 수: ${receivers.length}명\n` +
         `총 수량: ${totalQuantity}개`
@@ -125,7 +124,7 @@ const Order: React.FC = () => {
         productId,
         GiftMessageRef,
         selectedId as number,
-        SenderNameRef,
+        senderName,
         renewedReceivers,
         user
       ),
@@ -177,7 +176,8 @@ const Order: React.FC = () => {
             <input
               css={SenderInputStyle}
               type="text"
-              ref={SenderNameRef}
+              value={senderName}
+              onChange={(e) => setSenderName(e.target.value)}
               placeholder="이름을 입력하세요."
               defaultValue={user?.name}
             />
