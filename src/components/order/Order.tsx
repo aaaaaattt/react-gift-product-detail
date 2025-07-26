@@ -103,9 +103,14 @@ const Order: React.FC = () => {
     isError,
   } = useQuery({
     queryKey: ["productData", productId],
-    queryFn: () => getProductsSummary(productId as string),
+    queryFn: () => {
+      if (!productId) {
+        return;
+      }
+      return getProductsSummary(productId);
+    },
     enabled: !!productId,
-    select: (data) => data.data.data,
+    select: (data) => data?.data.data,
   });
 
   if (isError) {
