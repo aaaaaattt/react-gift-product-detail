@@ -122,7 +122,7 @@ const Order: React.FC = () => {
   const mutation = useMutation({
     mutationFn: () =>
       postOrder(
-        productId as string,
+        productId,
         GiftMessageRef,
         selectedId as number,
         SenderNameRef,

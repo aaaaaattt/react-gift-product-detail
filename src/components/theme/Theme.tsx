@@ -23,8 +23,12 @@ const ThemePage = () => {
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["getThemeProducts"],
-      queryFn: ({ pageParam = 0 }) =>
-        getThemeProducts(themeId as string, pageParam),
+      queryFn: ({ pageParam = 0 }) => {
+        if (!themeId) {
+          return Promise.reject("themeId값이 존재하지 않습니다.");
+        }
+        return getThemeProducts(themeId, pageParam);
+      },
       initialPageParam: 0,
       getNextPageParam: (lastPage) => {
         const { cursor, hasMoreList } = lastPage.data.data;
@@ -33,7 +37,7 @@ const ThemePage = () => {
     });
 
   const productList = useMemo(
-    () => data?.pages.flatMap((page) => page.data.data.list) || [],
+    () => data?.pages.flatMap((page) => page?.data.data.list) || [],
     [data]
   );
 
@@ -59,14 +63,24 @@ const ThemePage = () => {
 
   const { data: themeInfo, error } = useQuery({
     queryKey: ["themeInfo", themeId],
-    queryFn: () => getThemeInfo(themeId as string),
+    queryFn: () => {
+      if (!themeId) {
+        return Promise.reject("themeId값이 존재하지 않습니다.");
+      }
+      return getThemeInfo(themeId);
+    },
     enabled: !!themeId,
     select: (data) => data.data.data,
   });
 
   const { data: productInfo } = useQuery({
     queryKey: ["themeInfo", themeId],
-    queryFn: () => getThemeProductById(themeId as string),
+    queryFn: () => {
+      if (!themeId) {
+        return Promise.reject("themeId값이 존재하지 않습니다.");
+      }
+      return getThemeProductById(themeId);
+    },
     enabled: !!themeId,
     select: (data) => data.data.data,
   });

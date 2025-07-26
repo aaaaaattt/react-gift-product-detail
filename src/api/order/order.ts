@@ -7,7 +7,7 @@ export const getProductsSummary = (productId: string) =>
   api.get(`/products/${productId}/summary`);
 
 export const postOrder = (
-  productId: string,
+  productId: string | undefined,
   GiftMessageRef: React.RefObject<HTMLTextAreaElement | null>,
   selectedId: number,
   SenderNameRef: React.RefObject<HTMLInputElement>,
