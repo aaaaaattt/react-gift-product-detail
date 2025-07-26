@@ -1,6 +1,4 @@
-import { useRequestHandler } from "@/hooks/useRequestHandler";
-import axios from "axios";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import theme from "@/styles/theme";
@@ -13,38 +11,11 @@ import {
   getThemeProductById,
   getThemeProducts,
 } from "@/api/theme/theme";
-import { useInfiniteQuery } from "@tanstack/react-query";
-
-type ThemeInfo = {
-  name: string;
-  title: string;
-  description: string;
-  backgroundColor: string;
-};
-
-type ThemeProducts = {
-  list: Array<{
-    id: number;
-    name: string;
-    price: {
-      basicPrice: number;
-      sellingPrice: number;
-      discountRate: number;
-    };
-    imageURL: string;
-    brandInfo: {
-      id: number;
-      name: string;
-      imageURL: string;
-    };
-  }>;
-};
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const ThemePage = () => {
   const { themeId } = useParams();
-  const { fetchData } = useRequestHandler();
-  const [themeInfo, setThemeInfo] = useState<ThemeInfo | null>(null);
-  const [productInfo, setProductInfo] = useState<ThemeProducts | null>(null);
   const navigate = useNavigate();
   const { MAIN } = ROUTE_PATHS;
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -86,29 +57,25 @@ const ThemePage = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  useEffect(() => {
-    fetchData({
-      fetcher: () => getThemeInfo(themeId as string),
-      onSuccess: (data) => {
-        setThemeInfo(data.data.data);
-      },
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
-          const status = error.response?.status;
-          if (status == 404) {
-            navigate(MAIN);
-          }
-        }
-      },
-    });
+  const { data: themeInfo, error } = useQuery({
+    queryKey: ["themeInfo", themeId],
+    queryFn: () => getThemeInfo(themeId as string),
+    enabled: !!themeId,
+    select: (data) => data.data.data,
+  });
 
-    fetchData({
-      fetcher: () => getThemeProductById(themeId as string),
-      onSuccess: (data) => {
-        setProductInfo(data.data.data);
-      },
-    });
-  }, [MAIN, navigate, themeId]);
+  const { data: productInfo } = useQuery({
+    queryKey: ["themeInfo", themeId],
+    queryFn: () => getThemeProductById(themeId as string),
+    enabled: !!themeId,
+    select: (data) => data.data.data,
+  });
+
+  useEffect(() => {
+    if (error && axios.isAxiosError(error)) {
+      navigate(MAIN);
+    }
+  }, [error, navigate, MAIN, themeId]);
 
   if (!themeInfo || !productInfo) {
     return (
