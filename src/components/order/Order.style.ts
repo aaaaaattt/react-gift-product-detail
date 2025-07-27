@@ -130,24 +130,23 @@ export const totalPriceBoxStyle = (theme: Theme) => css`
 `;
 
 export const fixedBottomStyle = (theme: Theme) => css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
+  height: 50px;
   position: fixed;
-  max-width: 688px;
+  max-width: 720px;
   bottom: 0;
   background-color: ${theme.colors.yellow.yellow500};
-  padding: ${theme.spacing.spacing11};
 `;
 
 export const SubmitStyle = (theme: Theme) => css`
   width: 100%;
-  height : 50%
-  padding: ${theme.spacing.spacing4};
   color: black;
-  font-size: ${theme.typography.title1Regular.size};
-  font-weight: ${theme.typography.title1Regular.weight};
+  font-size: ${theme.typography.body2Bold.size};
+  font-weight: ${theme.typography.body2Bold.weight};
   border: none;
-  cursor: pointer;
-  text-align: center;
 `;
 
 export const InputWrapperStyle = (theme: Theme) => css`
