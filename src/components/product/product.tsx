@@ -1,4 +1,8 @@
-import { getProductDetail } from "@/api/product/product";
+import {
+  getProductDetail,
+  getProductExtraInfo,
+  getProductReview,
+} from "@/api/product/product";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useTheme } from "@emotion/react";
@@ -10,18 +14,29 @@ import {
   ProductInfoStyle,
   ProductNameStyle,
   ProductPriceStyle,
+  TabButtonStyle,
+  TabButtonContainer,
+  productAnnouncementsStyle,
+  TabPanelContainerStyle,
+  TabContentAreaStyle,
+  ReviewStyle,
 } from "@/components/product/ProductDetail.style";
+import { useMemo, useState } from "react";
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
   const theme = useTheme();
+  const [activeTab, setActiveTab] = useState("");
 
+  const tabs = ["상품설명", "선물후기", "상세정보"];
+
+  // 상품 정보
   const {
     data: product,
     error,
     isError,
   } = useQuery({
-    queryKey: ["productData", productId],
+    queryKey: ["productInfo", productId],
     queryFn: () => {
       if (!productId) {
         return;
@@ -32,8 +47,40 @@ const ProductDetailPage = () => {
     select: (data) => data?.data.data,
   });
 
+  // 상품 부가 정보
+  const { data: productExtraInfo } = useQuery({
+    queryKey: ["productExtraInfo", productId],
+    queryFn: () => {
+      if (!productId) {
+        return;
+      }
+      return getProductExtraInfo(productId);
+    },
+    enabled: !!productId,
+    select: (data) => data?.data.data,
+  });
+
+  // 상품 리뷰
+  const { data: productReview } = useQuery({
+    queryKey: ["productReview", productId],
+    queryFn: () => {
+      if (!productId) {
+        return;
+      }
+      return getProductReview(productId);
+    },
+    enabled: !!productId,
+    select: (data) => data?.data.data,
+  });
+
+  const reviewList = useMemo(() => {
+    return productReview?.reviews.slice(0, 10);
+  }, [productReview]);
+
+  console.log(reviewList);
+
   return (
-    <>
+    <div css={TabPanelContainerStyle}>
       <div css={ProductInfoContainerStyle(theme)}>
         <img src={product?.imageURL} css={ProductImageStyle} />
 
@@ -51,7 +98,53 @@ const ProductDetailPage = () => {
           </div>
         </div>
       </div>
-    </>
+
+      {/* 상품 부가 정보 */}
+      <div>
+        <div css={TabButtonContainer(theme)}>
+          {tabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              css={TabButtonStyle(theme, activeTab === tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+        <div css={TabContentAreaStyle}>
+          {activeTab === tabs[0] && (
+            <div
+              dangerouslySetInnerHTML={{
+                __html: productExtraInfo?.description ?? "",
+              }}
+            />
+          )}
+
+          {activeTab === tabs[1] && (
+            <div>
+              {reviewList?.map((review) => (
+                <div css={ReviewStyle(theme)}>
+                  <strong>{review.authorName}</strong>
+                  <div>{review.content}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {activeTab === tabs[2] && (
+            <div>
+              {productExtraInfo?.announcements.map((d) => (
+                <div css={productAnnouncementsStyle}>
+                  <strong>{d.name}</strong>
+                  <div>{d.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 
