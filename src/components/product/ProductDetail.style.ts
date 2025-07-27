@@ -4,6 +4,7 @@ import type { Theme } from "@emotion/react";
 export const ProductInfoContainerStyle = (theme: Theme) => css`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: ${theme.spacing.spacing6};
   padding: ${theme.spacing.spacing6};
 `;

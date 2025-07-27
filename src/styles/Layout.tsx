@@ -13,7 +13,6 @@ const layoutStyle = css`
   width: 100%;
   max-width: 720px;
   background-color: white;
-  padding: 0 16px;
 `;
 
 type Props = {
