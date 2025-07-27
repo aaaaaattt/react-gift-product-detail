@@ -4,7 +4,7 @@ import {
   getProductReview,
 } from "@/api/product/product";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import {
   ProductBrandImageStyle,
@@ -22,9 +22,11 @@ import {
   ReviewStyle,
 } from "@/components/product/ProductDetail.style";
 import { useMemo, useState } from "react";
+import { fixedBottomStyle, SubmitStyle } from "@/components/order/Order.style";
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
+  const navigate = useNavigate();
   const theme = useTheme();
   const [activeTab, setActiveTab] = useState("상품설명");
 
@@ -95,6 +97,11 @@ const ProductDetailPage = () => {
               css={ProductBrandImageStyle}
             />
             <span>{product?.brandInfo.name}</span>
+          </div>
+        </div>
+        <div css={fixedBottomStyle(theme)}>
+          <div onClick={() => navigate(`/order/${product?.id}`)}>
+            <p css={SubmitStyle(theme)}>주문하기</p>
           </div>
         </div>
       </div>
