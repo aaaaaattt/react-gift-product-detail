@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import type { Theme } from "@emotion/react";
 
-export const ProductDetailContainerStyle = (theme: Theme) => css`
+export const ProductInfoContainerStyle = (theme: Theme) => css`
   display: flex;
   flex-direction: column;
   gap: ${theme.spacing.spacing6};

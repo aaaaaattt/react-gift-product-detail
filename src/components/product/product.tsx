@@ -1,11 +1,11 @@
-import { getProductDetail } from "@/api/product/prooduct";
+import { getProductDetail } from "@/api/product/product";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import {
   ProductBrandImageStyle,
   ProductBrandStyle,
-  ProductDetailContainerStyle,
+  ProductInfoContainerStyle,
   ProductImageStyle,
   ProductInfoStyle,
   ProductNameStyle,
@@ -34,7 +34,7 @@ const ProductDetailPage = () => {
 
   return (
     <>
-      <div css={ProductDetailContainerStyle(theme)}>
+      <div css={ProductInfoContainerStyle(theme)}>
         <img src={product?.imageURL} css={ProductImageStyle} />
 
         <div css={ProductInfoStyle(theme)}>
