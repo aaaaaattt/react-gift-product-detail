@@ -8,8 +8,9 @@ import { ROUTE_PATHS } from "./constants/routePath";
 import App from "@/App";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ThemePage from "@/components/theme/Theme";
+import ProductDetailPage from "./components/product/product";
 
-const { MAIN, LOGIN, MYPAGE, ORDER, NOT_FOUND, THEME } = ROUTE_PATHS;
+const { MAIN, LOGIN, MYPAGE, ORDER, NOT_FOUND, THEME, PRODUCT } = ROUTE_PATHS;
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
       {
         path: NOT_FOUND,
         element: <NotFound />,
+      },
+      {
+        path: PRODUCT,
+        element: <ProductDetailPage />,
       },
     ],
   },

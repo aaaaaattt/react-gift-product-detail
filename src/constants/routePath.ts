@@ -5,4 +5,5 @@ export const ROUTE_PATHS = {
   ORDER: "/order/:productId",
   THEME: "/theme/:themeId",
   NOT_FOUND: "*",
+  PRODUCT: "/product/:productId",
 } as const;
