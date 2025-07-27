@@ -8,7 +8,7 @@ import { ROUTE_PATHS } from "./constants/routePath";
 import App from "@/App";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ThemePage from "@/components/theme/Theme";
-import ProductDetailPage from "./components/product/product";
+import ProductDetailPage from "./components/product/Product";
 
 const { MAIN, LOGIN, MYPAGE, ORDER, NOT_FOUND, THEME, PRODUCT } = ROUTE_PATHS;
 
