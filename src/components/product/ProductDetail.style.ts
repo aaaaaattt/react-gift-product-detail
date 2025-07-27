@@ -58,9 +58,10 @@ export const TabButtonStyle = (theme: Theme, isActive: boolean) => css`
   text-align: center;
   padding: ${theme.spacing.spacing4};
   font-size: ${theme.typography.body1Regular.size};
-  font-weight: ${isActive
-    ? theme.typography.body1Bold.weight
-    : theme.typography.body1Regular.weight};
+  font-weight: ${theme.typography.body1Bold.weight};
+
+  height: 48px;
+
   color: ${isActive ? theme.colors.gray.gray1000 : theme.colors.gray.gray500};
   border: none;
   background: none;
@@ -71,6 +72,34 @@ export const TabButtonStyle = (theme: Theme, isActive: boolean) => css`
 `;
 
 export const productAnnouncementsStyle = (theme: Theme) => css`
+  display: flex;
+  flex-direction: column;
+  font-size: ${theme.typography.label1Regular.size};
+  gap: ${theme.spacing.spacing2};
+  padding: ${theme.spacing.spacing3};
+`;
+
+export const TabPanelContainerStyle = css`
+  width: 100%;
+  min-height: 300px;
+`;
+
+export const TabContentAreaStyle = css`
+  padding: 16px 0;
+
+  * {
+    max-width: 100%;
+    word-break: break-word;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+`;
+
+export const ReviewStyle = (theme: Theme) => css`
   display: flex;
   flex-direction: column;
   font-size: ${theme.typography.label1Regular.size};
