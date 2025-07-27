@@ -46,3 +46,34 @@ export const ProductBrandImageStyle = css`
   border-radius: 50%;
   object-fit: cover;
 `;
+
+export const TabButtonContainer = (theme: Theme) => css`
+  display: flex;
+  gap: ${theme.spacing.spacing2};
+  border-bottom: 1px solid ${theme.colors.gray.gray300};
+`;
+
+export const TabButtonStyle = (theme: Theme, isActive: boolean) => css`
+  flex: 1;
+  text-align: center;
+  padding: ${theme.spacing.spacing4};
+  font-size: ${theme.typography.body1Regular.size};
+  font-weight: ${isActive
+    ? theme.typography.body1Bold.weight
+    : theme.typography.body1Regular.weight};
+  color: ${isActive ? theme.colors.gray.gray1000 : theme.colors.gray.gray500};
+  border: none;
+  background: none;
+  border-bottom: ${isActive
+    ? `3px solid ${theme.colors.yellow.yellow500}`
+    : "3px solid transparent"};
+  cursor: pointer;
+`;
+
+export const productAnnouncementsStyle = (theme: Theme) => css`
+  display: flex;
+  flex-direction: column;
+  font-size: ${theme.typography.label1Regular.size};
+  gap: ${theme.spacing.spacing2};
+  padding: ${theme.spacing.spacing3};
+`;
