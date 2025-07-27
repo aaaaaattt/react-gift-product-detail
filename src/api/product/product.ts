@@ -1,7 +1,7 @@
 import { api } from "@/libs/axios";
 import type { AxiosResponse } from "axios";
 
-type ProductDetail = {
+type ProductInfo = {
   id: number;
   name: string;
   price: {
@@ -16,8 +16,23 @@ type ProductDetail = {
     imageURL: string;
   };
 };
+type Announcement = {
+  name: string;
+  value: string;
+  displayOrder: number;
+};
+
+type ProductExtraInfo = {
+  description: string;
+  announcements: Announcement[];
+};
 
 export const getProductDetail = (
   productId: string
-): Promise<AxiosResponse<{ data: ProductDetail }>> =>
+): Promise<AxiosResponse<{ data: ProductInfo }>> =>
   api.get(`/products/${productId}`);
+
+export const getProductExtraInfo = (
+  productId: string
+): Promise<AxiosResponse<{ data: ProductExtraInfo }>> =>
+  api.get(`/products/${productId}/detail`);
