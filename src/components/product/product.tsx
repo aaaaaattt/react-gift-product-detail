@@ -26,7 +26,7 @@ import { useMemo, useState } from "react";
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
   const theme = useTheme();
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("상품설명");
 
   const tabs = ["상품설명", "선물후기", "상세정보"];
 
