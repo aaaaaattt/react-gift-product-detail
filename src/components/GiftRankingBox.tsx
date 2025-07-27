@@ -43,7 +43,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
               <GiftObject
                 key={product.id}
                 gift={product}
-                onClick={() => navigate(`/order/${product.id}`)}
+                onClick={() => navigate(`/product/${product.id}`)}
               />
             ))}
         </>
