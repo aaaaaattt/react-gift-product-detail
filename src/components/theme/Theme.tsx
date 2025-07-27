@@ -1,6 +1,4 @@
-import { useRequestHandler } from "@/hooks/useRequestHandler";
-import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import theme from "@/styles/theme";
@@ -8,118 +6,90 @@ import { css } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
-import { api } from "@/libs/axios";
-
-type ThemeInfo = {
-  name: string;
-  title: string;
-  description: string;
-  backgroundColor: string;
-};
-
-type ThemeProducts = {
-  list: Array<{
-    id: number;
-    name: string;
-    price: {
-      basicPrice: number;
-      sellingPrice: number;
-      discountRate: number;
-    };
-    imageURL: string;
-    brandInfo: {
-      id: number;
-      name: string;
-      imageURL: string;
-    };
-  }>;
-};
+import {
+  getThemeInfo,
+  getThemeProductById,
+  getThemeProducts,
+} from "@/api/theme/theme";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const ThemePage = () => {
   const { themeId } = useParams();
-  const { fetchData } = useRequestHandler();
-  const [themeInfo, setThemeInfo] = useState<ThemeInfo | null>(null);
-  const [productInfo, setProductInfo] = useState<ThemeProducts | null>(null);
   const navigate = useNavigate();
   const { MAIN } = ROUTE_PATHS;
-  const [productList, setProductList] = useState<ThemeProducts["list"]>([]);
-  const [cursor, setCursor] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteQuery({
+      queryKey: ["getThemeProducts"],
+      queryFn: ({ pageParam = 0 }) => {
+        if (!themeId) {
+          return Promise.reject("themeId값이 존재하지 않습니다.");
+        }
+        return getThemeProducts(themeId, pageParam);
+      },
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => {
+        const { cursor, hasMoreList } = lastPage.data.data;
+        return hasMoreList ? cursor + 10 : undefined;
+      },
+    });
+
+  const productList = useMemo(
+    () => data?.pages.flatMap((page) => page?.data.data.list) || [],
+    [data]
+  );
+
   useEffect(() => {
+    const targetNode = observerRef.current;
+    if (!targetNode) return;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && hasMore && !isLoading) {
-          loadProducts(cursor);
+        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
       },
-      { threshold: 1.0 }
+      { threshold: 0.5 }
     );
 
-    if (observerRef.current) {
-      observer.observe(observerRef.current);
-    }
+    observer.observe(targetNode);
 
     return () => {
-      if (observerRef.current) {
-        observer.unobserve(observerRef.current);
-      }
+      observer.unobserve(targetNode);
     };
-  }, [cursor, hasMore, isLoading]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const loadProducts = (cursor: number) => {
-    if (isLoading || !hasMore) return;
+  const { data: themeInfo, error } = useQuery({
+    queryKey: ["themeInfo", themeId],
+    queryFn: () => {
+      if (!themeId) {
+        return Promise.reject("themeId값이 존재하지 않습니다.");
+      }
+      return getThemeInfo(themeId);
+    },
+    enabled: !!themeId,
+    select: (data) => data.data.data,
+  });
 
-    setIsLoading(true);
-    fetchData({
-      fetcher: () =>
-        api.get(`/themes/${themeId}/products?cursor=${cursor}&limit=10`),
-      onSuccess: (data) => {
-        const newProducts = data.data.data.list;
-        setProductList((prev) => [...prev, ...newProducts]);
-
-        if (newProducts.length < 10) {
-          setHasMore(false);
-        } else {
-          setCursor(cursor + newProducts.length);
-        }
-
-        setIsLoading(false);
-      },
-      onError: () => {
-        setIsLoading(false);
-      },
-    });
-  };
+  const { data: productInfo } = useQuery({
+    queryKey: ["themeInfo", themeId],
+    queryFn: () => {
+      if (!themeId) {
+        return Promise.reject("themeId값이 존재하지 않습니다.");
+      }
+      return getThemeProductById(themeId);
+    },
+    enabled: !!themeId,
+    select: (data) => data.data.data,
+  });
 
   useEffect(() => {
-    fetchData({
-      fetcher: () =>
-        api.get(`/themes/${themeId}/info?cursor=${cursor}&limit=10`),
-      onSuccess: (data) => {
-        setThemeInfo(data.data.data);
-      },
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
-          const status = error.response?.status;
-          if (status == 404) {
-            navigate(MAIN);
-          }
-        }
-      },
-    });
-
-    fetchData({
-      fetcher: () => api.get(`/themes/${themeId}/products `),
-      onSuccess: (data) => {
-        setProductInfo(data.data.data);
-      },
-    });
-    loadProducts(0);
-  }, [themeId]);
+    if (error && axios.isAxiosError(error)) {
+      navigate(MAIN);
+    }
+  }, [error, navigate, MAIN, themeId]);
 
   if (!themeInfo || !productInfo) {
     return (
@@ -147,7 +117,7 @@ const ThemePage = () => {
             </strong>
           </div>
         ))}
-        {hasMore && <div ref={observerRef} style={{ height: "1px" }} />}
+        {hasNextPage && <div ref={observerRef} style={{ height: "1px" }} />}
       </div>
     </div>
   );

@@ -3,25 +3,9 @@ import { css } from "@emotion/react";
 import GiftObject from "./GiftObject";
 import { useTheme } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { ClipLoader } from "react-spinners";
-import { api } from "@/libs/axios";
-
-type ProductRanking = {
-  id: number;
-  name: string;
-  price: {
-    basicPrice: number;
-    sellingPrice: number;
-    discountRate: number;
-  };
-  imageURL: string;
-  brandInfo: {
-    id: number;
-    name: string;
-    imageURL: string;
-  };
-};
+import { useQuery } from "@tanstack/react-query";
+import { getProductsFiltered } from "@/api/gift/gift";
 
 type GiftRankingProps = {
   target: string;
@@ -30,31 +14,20 @@ type GiftRankingProps = {
 
 const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
   const theme = useTheme();
-  const [productRankingData, setProductRankingData] = useState<
-    ProductRanking[] | null
-  >(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-
-  const sortParam = `/products/ranking?targetType=${target}&rankType=${rankType}`;
-
-  useEffect(() => {
-    const fetchProductRanking = async () => {
-      try {
-        const response = await api.get(sortParam);
-        setProductRankingData(response.data.data);
-      } catch (error) {
-        console.error("Error fetching theme data:", error);
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProductRanking();
-  }, [sortParam]);
-
+  const productsFiltered = `/products/ranking?targetType=${target}&rankType=${rankType}`;
   const navigate = useNavigate();
+
+  const {
+    data: productRankingData,
+    isError,
+    isLoading,
+  } = useQuery({
+    queryKey: ["productRanking", target, rankType],
+    queryFn: () => getProductsFiltered(productsFiltered),
+    enabled: !!target && !!rankType,
+    select: (data) => data.data.data,
+  });
+
   return (
     <div css={giftRankingStyle(theme)}>
       {isError && <div>상품 목록이 없습니다.</div>}

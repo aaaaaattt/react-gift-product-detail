@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { cardData } from "@/data/cardData";
 import { useTheme } from "@emotion/react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -30,23 +30,15 @@ import type { Theme } from "@emotion/react";
 import ReceiverInfoTable from "@/components/order/ReceiverInfoTable";
 import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
-import { useRequestHandler } from "@/hooks/useRequestHandler";
 import { ROUTE_PATHS } from "@/constants/routePath";
-import { api } from "@/libs/axios";
-
-type Product = {
-  id: number;
-  name: string;
-  brandName: string;
-  price: number;
-  imageURL: string;
-};
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getProductsSummary, postOrder } from "@/api/order/order";
 
 const Order: React.FC = () => {
   const theme = useTheme();
   const [selectedId, setSelectedId] = useState<number>();
   const { productId } = useParams<{ productId: string }>();
-  const SenderNameRef = useRef<HTMLInputElement>(null);
+
   const GiftMessageRef = useRef<HTMLTextAreaElement>(null);
   const [messageError, setMessageError] = useState("");
   const [senderError, setSenderError] = useState("");
@@ -54,7 +46,8 @@ const Order: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [receivers, setReceivers] = useState<FormData["order"]>([]);
   const navigate = useNavigate();
-  const [product, setProduct] = useState<Product | null>(null);
+  const [senderName, setSenderName] = useState("");
+
   const { MAIN, LOGIN } = ROUTE_PATHS;
 
   const totalQuantity =
@@ -64,7 +57,7 @@ const Order: React.FC = () => {
 
   const handleSubmit = () => {
     const msg = GiftMessageRef.current?.value.trim() ?? "";
-    const sender = SenderNameRef.current?.value.trim() ?? "";
+    const sender = senderName ?? "";
     const isReceiverExists = receivers.length > 0;
 
     if (sender === "") {
@@ -93,7 +86,7 @@ const Order: React.FC = () => {
 
     alert(
       `주문 상품명: ${product?.name}\n` +
-        `보내는 사람: ${SenderNameRef.current?.value}\n` +
+        `보내는 사람: ${senderName}\n` +
         `메시지: ${GiftMessageRef.current?.value}\n` +
         `받는 사람 수: ${receivers.length}명\n` +
         `총 수량: ${totalQuantity}개`
@@ -102,24 +95,49 @@ const Order: React.FC = () => {
   };
 
   const { user } = useUserInfo();
-  const ORDER = "/order";
 
-  const { fetchData } = useRequestHandler();
+  const {
+    data: product,
+    error,
+    isError,
+  } = useQuery({
+    queryKey: ["productData", productId],
+    queryFn: () => {
+      if (!productId) {
+        return;
+      }
+      return getProductsSummary(productId);
+    },
+    enabled: !!productId,
+    select: (data) => data?.data.data,
+  });
 
-  useEffect(() => {
-    if (!productId) return;
-    fetchData({
-      fetcher: () => api.get(`/products/${productId}/summary`),
-      onSuccess: (data) => {
-        setProduct(data.data.data);
-      },
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
+  if (isError) {
+    if (axios.isAxiosError(error)) {
+      navigate(LOGIN);
+    }
+  }
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      postOrder(
+        productId,
+        GiftMessageRef,
+        selectedId as number,
+        senderName,
+        renewedReceivers,
+        user
+      ),
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
           navigate(LOGIN);
+        } else {
+          alert("주문에 실패했습니다. 다시 시도해주세요.");
         }
-      },
-    });
-  }, [productId]);
+      }
+    },
+  });
 
   const renewedReceivers = receivers.map((receiver) => ({
     name: receiver.receiverName,
@@ -158,7 +176,8 @@ const Order: React.FC = () => {
             <input
               css={SenderInputStyle}
               type="text"
-              ref={SenderNameRef}
+              value={senderName}
+              onChange={(e) => setSenderName(e.target.value)}
               placeholder="이름을 입력하세요."
               defaultValue={user?.name}
             />
@@ -213,29 +232,7 @@ const Order: React.FC = () => {
         <div
           onClick={async () => {
             handleSubmit();
-            try {
-              await api.post(
-                ORDER,
-                {
-                  productId: Number(productId),
-                  message: GiftMessageRef.current?.value,
-                  messageCardId: String(selectedId),
-                  ordererName: SenderNameRef.current?.value,
-                  receivers: renewedReceivers,
-                },
-                {
-                  headers: {
-                    Authorization: user?.authToken,
-                  },
-                }
-              );
-            } catch (error) {
-              if (axios.isAxiosError(error)) {
-                if (error.response?.status === 401) {
-                  navigate(LOGIN);
-                }
-              }
-            }
+            mutation.mutate();
           }}
           css={totalPriceBoxStyle}
         >
