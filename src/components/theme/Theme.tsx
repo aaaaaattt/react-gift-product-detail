@@ -8,7 +8,7 @@ import { ROUTE_PATHS } from "@/constants/routePath";
 import type { Theme } from "@emotion/react";
 import {
   getThemeInfo,
-  getThemeProductById,
+  getThemeProductByThemeId,
   getThemeProducts,
 } from "@/api/theme/theme";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -20,6 +20,7 @@ const ThemePage = () => {
   const { MAIN } = ROUTE_PATHS;
   const observerRef = useRef<HTMLDivElement | null>(null);
 
+  //테마 상품들 불러오기
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useInfiniteQuery({
       queryKey: ["getThemeProducts"],
@@ -36,11 +37,13 @@ const ThemePage = () => {
       },
     });
 
+  //상품 목록을 평탄화하여 사용
   const productList = useMemo(
     () => data?.pages.flatMap((page) => page?.data.data.list) || [],
     [data]
   );
 
+  //무한 스크롤
   useEffect(() => {
     const targetNode = observerRef.current;
     if (!targetNode) return;
@@ -73,18 +76,20 @@ const ThemePage = () => {
     select: (data) => data.data.data,
   });
 
+  // 테마 정보와 상품 정보를 불러오기
   const { data: productInfo } = useQuery({
     queryKey: ["themeInfo", themeId],
     queryFn: () => {
       if (!themeId) {
         return Promise.reject("themeId값이 존재하지 않습니다.");
       }
-      return getThemeProductById(themeId);
+      return getThemeProductByThemeId(themeId);
     },
     enabled: !!themeId,
     select: (data) => data.data.data,
   });
 
+  // 에러 발생 시 메인 페이지로 리다이렉트
   useEffect(() => {
     if (error && axios.isAxiosError(error)) {
       navigate(MAIN);
@@ -108,7 +113,10 @@ const ThemePage = () => {
       </div>
       <div css={themeProductListStyle(theme)}>
         {productList.map((product) => (
-          <div key={product.id}>
+          <div
+            key={product.id}
+            onClick={() => navigate(`/product/${product.id}`)}
+          >
             <img src={product.imageURL} alt={product.name} />
             <h4 css={brandTextStyle(theme)}>{product.brandInfo.name}</h4>
             <h4 css={productNameStyle(theme)}>{product.name}</h4>
