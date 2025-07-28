@@ -3,7 +3,7 @@ import {
   getProductExtraInfo,
   getProductReview,
 } from "@/api/product/product";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTheme } from "@emotion/react";
 import {
@@ -34,11 +34,7 @@ const ProductDetailPage = () => {
   const tabs = ["상품설명", "선물후기", "상세정보"];
 
   // 상품 정보
-  const {
-    data: product,
-    error,
-    isError,
-  } = useQuery({
+  const { data: product } = useSuspenseQuery({
     queryKey: ["productInfo", productId],
     queryFn: () => {
       if (!productId) {
@@ -46,12 +42,12 @@ const ProductDetailPage = () => {
       }
       return getProductDetail(productId);
     },
-    enabled: !!productId,
+    // enabled: !!productId,
     select: (data) => data?.data.data,
   });
 
   // 상품 부가 정보
-  const { data: productExtraInfo } = useQuery({
+  const { data: productExtraInfo } = useSuspenseQuery({
     queryKey: ["productExtraInfo", productId],
     queryFn: () => {
       if (!productId) {
@@ -59,7 +55,7 @@ const ProductDetailPage = () => {
       }
       return getProductExtraInfo(productId);
     },
-    enabled: !!productId,
+    // enabled: !!productId,
     select: (data) => data?.data.data,
   });
 

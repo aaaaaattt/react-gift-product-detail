@@ -31,7 +31,7 @@ import ReceiverInfoTable from "@/components/order/ReceiverInfoTable";
 import axios from "axios";
 import { useUserInfo } from "@/hooks/useUserInfo";
 import { ROUTE_PATHS } from "@/constants/routePath";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { getProductsSummary, postOrder } from "@/api/order/order";
 
 const Order: React.FC = () => {
@@ -100,7 +100,7 @@ const Order: React.FC = () => {
     data: product,
     error,
     isError,
-  } = useQuery({
+  } = useSuspenseQuery({
     queryKey: ["productData", productId],
     queryFn: () => {
       if (!productId) {
@@ -108,7 +108,7 @@ const Order: React.FC = () => {
       }
       return getProductsSummary(productId);
     },
-    enabled: !!productId,
+    // enabled: !!productId,
     select: (data) => data?.data.data,
   });
 

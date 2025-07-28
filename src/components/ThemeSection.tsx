@@ -3,7 +3,7 @@ import { css } from "@emotion/react";
 import { useTheme } from "@emotion/react";
 import { ClipLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { getTheme } from "@/api/theme/theme";
 
 type ThemeItem = {
@@ -20,7 +20,7 @@ const ThemeSection = () => {
     data: themeData,
     isError: isThemeError,
     isLoading: isThemeLoading,
-  } = useQuery({
+  } = useSuspenseQuery({
     queryKey: ["themeData"],
     queryFn: () => getTheme(),
     select: (data) => data.data.data,

@@ -11,7 +11,7 @@ import {
   getThemeProductByThemeId,
   getThemeProducts,
 } from "@/api/theme/theme";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useSuspenseQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 const ThemePage = () => {
@@ -64,7 +64,7 @@ const ThemePage = () => {
     };
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  const { data: themeInfo, error } = useQuery({
+  const { data: themeInfo, error } = useSuspenseQuery({
     queryKey: ["themeInfo", themeId],
     queryFn: () => {
       if (!themeId) {
@@ -72,12 +72,12 @@ const ThemePage = () => {
       }
       return getThemeInfo(themeId);
     },
-    enabled: !!themeId,
+    // enabled: !!themeId,
     select: (data) => data.data.data,
   });
 
   // 테마 정보와 상품 정보를 불러오기
-  const { data: productInfo } = useQuery({
+  const { data: productInfo } = useSuspenseQuery({
     queryKey: ["themeInfo", themeId],
     queryFn: () => {
       if (!themeId) {
@@ -85,7 +85,7 @@ const ThemePage = () => {
       }
       return getThemeProductByThemeId(themeId);
     },
-    enabled: !!themeId,
+    // enabled: !!themeId,
     select: (data) => data.data.data,
   });
 
