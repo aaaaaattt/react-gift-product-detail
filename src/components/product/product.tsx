@@ -23,6 +23,7 @@ import {
 } from "@/components/product/ProductDetail.style";
 import { useMemo, useState } from "react";
 import { fixedBottomStyle, SubmitStyle } from "@/components/order/Order.style";
+import { useWishPost } from "@/hooks/useWishPost";
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -75,11 +76,12 @@ const ProductDetailPage = () => {
     select: (data) => data?.data.data,
   });
 
+  //리뷰 목록 10개
   const reviewList = useMemo(() => {
     return productReview?.reviews.slice(0, 10);
   }, [productReview]);
 
-  console.log(reviewList);
+  const mutation = useWishPost();
 
   return (
     <div css={TabPanelContainerStyle}>
@@ -100,6 +102,15 @@ const ProductDetailPage = () => {
           </div>
         </div>
         <div css={fixedBottomStyle(theme)}>
+          <div
+            onClick={() => {
+              if (productId) {
+                mutation.mutate(productId);
+              }
+            }}
+          >
+            <p>{productReview?.totalCount ?? 0}❤️</p>
+          </div>
           <div onClick={() => navigate(`/order/${product?.id}`)}>
             <p css={SubmitStyle(theme)}>주문하기</p>
           </div>
