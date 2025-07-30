@@ -1,4 +1,12 @@
 import { api } from "@/libs/axios";
+import type { AxiosResponse } from "axios";
 
-export const postProductWish = (productId: string) =>
-  api.post(`/products/${productId}/wish`);
+type wishData = {
+  wishCount: number;
+  isWished: boolean;
+};
+
+export const getProductWish = (
+  productId: string
+): Promise<AxiosResponse<{ data: wishData }>> =>
+  api.get(`/products/${productId}/wish`);
