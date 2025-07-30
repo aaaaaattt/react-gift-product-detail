@@ -21,11 +21,9 @@ function App() {
           <UserInfoProvider>
             <NavigationBar />
             <QueryClientProvider client={queryClient}>
-              <ErrorBoundary>
-                <Suspense fallback={<div>로딩중...</div>}>
-                  <Outlet />
-                </Suspense>
-              </ErrorBoundary>
+              <Suspense fallback={<div>로딩중...</div>}>
+                <Outlet />
+              </Suspense>
             </QueryClientProvider>
           </UserInfoProvider>
         </Layout>

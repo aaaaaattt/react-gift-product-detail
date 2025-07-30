@@ -24,6 +24,7 @@ import {
 import { useMemo, useState } from "react";
 import { fixedBottomStyle, SubmitStyle } from "@/components/order/Order.style";
 import { useWishPost } from "@/hooks/useWishPost";
+import ErrorBoundary from "@/common/ErrorBoundary";
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -127,35 +128,41 @@ const ProductDetailPage = () => {
           ))}
         </div>
         <div css={TabContentAreaStyle}>
-          {activeTab === tabs[0] && (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: productExtraInfo?.description ?? "",
-              }}
-            />
-          )}
+          <ErrorBoundary fallback={<p>상품 설명을 불러오지 못했습니다.</p>}>
+            {activeTab === tabs[0] && (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: productExtraInfo?.description ?? "",
+                }}
+              />
+            )}
+          </ErrorBoundary>
 
-          {activeTab === tabs[1] && (
-            <div>
-              {reviewList?.map((review) => (
-                <div key={review.id} css={ReviewStyle(theme)}>
-                  <strong>{review.authorName}</strong>
-                  <div>{review.content}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          <ErrorBoundary fallback={<p>선물후기를 불러오지 못했습니다.</p>}>
+            {activeTab === tabs[1] && (
+              <div>
+                {reviewList?.map((review) => (
+                  <div key={review.id} css={ReviewStyle(theme)}>
+                    <strong>{review.authorName}</strong>
+                    <div>{review.content}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ErrorBoundary>
 
-          {activeTab === tabs[2] && (
-            <div>
-              {productExtraInfo?.announcements.map((d) => (
-                <div key={d.name} css={productAnnouncementsStyle}>
-                  <strong>{d.name}</strong>
-                  <div>{d.value}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          <ErrorBoundary fallback={<p>상세정보를 불러오지 못했습니다.</p>}>
+            {activeTab === tabs[2] && (
+              <div>
+                {productExtraInfo?.announcements.map((d) => (
+                  <div key={d.name} css={productAnnouncementsStyle}>
+                    <strong>{d.name}</strong>
+                    <div>{d.value}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ErrorBoundary>
         </div>
       </div>
     </div>
