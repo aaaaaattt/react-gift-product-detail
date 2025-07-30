@@ -1,23 +1,18 @@
-import { postProductWish } from "@/api/wish/wish";
+import { getProductWish } from "@/api/wish/wish";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useWishPost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (productId: string) => postProductWish(productId),
+    mutationFn: (productId: string) => getProductWish(productId),
 
     onMutate: async (productId) => {
-      await queryClient.cancelQueries({
-        queryKey: ["productReview", productId],
-      });
+      await queryClient.cancelQueries({ queryKey: ["productWish", productId] });
 
-      const previousData = queryClient.getQueryData([
-        "productReview",
-        productId,
-      ]);
+      const previousData = queryClient.getQueryData(["productWish", productId]);
 
-      queryClient.setQueryData(["productReview", productId], (old: any) => {
+      queryClient.setQueryData(["productWish", productId], (old: any) => {
         if (!old) return;
 
         const data = old.data.data;
@@ -28,13 +23,22 @@ export function useWishPost() {
             ...old.data,
             data: {
               ...data,
-              totalCount: (data.totalCount ?? 0) + 1,
+              wishCount: (data.wishCount ?? 0) + 1,
+              isWished: !data.isWished,
             },
           },
         };
       });
 
       return { previousData };
+    },
+    onError: (error, productId, context) => {
+      if (context?.previousData) {
+        queryClient.setQueryData(
+          ["productWish", productId],
+          context.previousData
+        );
+      }
     },
   });
 }
