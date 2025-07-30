@@ -138,7 +138,7 @@ const ProductDetailPage = () => {
           {activeTab === tabs[1] && (
             <div>
               {reviewList?.map((review) => (
-                <div css={ReviewStyle(theme)}>
+                <div key={review.id} css={ReviewStyle(theme)}>
                   <strong>{review.authorName}</strong>
                   <div>{review.content}</div>
                 </div>
@@ -149,7 +149,7 @@ const ProductDetailPage = () => {
           {activeTab === tabs[2] && (
             <div>
               {productExtraInfo?.announcements.map((d) => (
-                <div css={productAnnouncementsStyle}>
+                <div key={d.name} css={productAnnouncementsStyle}>
                   <strong>{d.name}</strong>
                   <div>{d.value}</div>
                 </div>
