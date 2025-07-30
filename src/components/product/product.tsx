@@ -25,6 +25,7 @@ import { useMemo, useState } from "react";
 import { fixedBottomStyle, SubmitStyle } from "@/components/order/Order.style";
 import { useWishPost } from "@/hooks/useWishPost";
 import ErrorBoundary from "@/common/ErrorBoundary";
+import { getProductWish } from "@/api/wish/wish";
 
 const ProductDetailPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -43,7 +44,6 @@ const ProductDetailPage = () => {
       }
       return getProductDetail(productId);
     },
-    // enabled: !!productId,
     select: (data) => data?.data.data,
   });
 
@@ -56,7 +56,6 @@ const ProductDetailPage = () => {
       }
       return getProductExtraInfo(productId);
     },
-    // enabled: !!productId,
     select: (data) => data?.data.data,
   });
 
@@ -68,6 +67,19 @@ const ProductDetailPage = () => {
         return;
       }
       return getProductReview(productId);
+    },
+    enabled: !!productId,
+    select: (data) => data?.data.data,
+  });
+
+  //상품 관심 수
+  const { data: productWish } = useQuery({
+    queryKey: ["productWish", productId],
+    queryFn: () => {
+      if (!productId) {
+        return;
+      }
+      return getProductWish(productId);
     },
     enabled: !!productId,
     select: (data) => data?.data.data,
@@ -101,12 +113,12 @@ const ProductDetailPage = () => {
         <div css={fixedBottomStyle(theme)}>
           <div
             onClick={() => {
-              if (productId) {
+              if (productId && !productWish?.isWished) {
                 mutation.mutate(productId);
               }
             }}
           >
-            <p>{productReview?.totalCount ?? 0}❤️</p>
+            <p>{productWish?.wishCount ?? 0}❤️</p>
           </div>
           <div onClick={() => navigate(`/order/${product?.id}`)}>
             <p css={SubmitStyle(theme)}>주문하기</p>
@@ -114,7 +126,6 @@ const ProductDetailPage = () => {
         </div>
       </div>
 
-      {/* 상품 부가 정보 */}
       <div>
         <div css={TabButtonContainer(theme)}>
           {tabs.map((tab) => (
