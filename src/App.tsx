@@ -9,6 +9,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Outlet } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ErrorBoundary from "@/common/ErrorBoundary";
+import { Suspense } from "react";
 
 function App() {
   const queryClient = new QueryClient();
@@ -19,7 +21,9 @@ function App() {
           <UserInfoProvider>
             <NavigationBar />
             <QueryClientProvider client={queryClient}>
-              <Outlet />
+              <Suspense fallback={<div>로딩중...</div>}>
+                <Outlet />
+              </Suspense>
             </QueryClientProvider>
           </UserInfoProvider>
         </Layout>

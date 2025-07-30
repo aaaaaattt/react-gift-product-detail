@@ -18,7 +18,7 @@ export const getThemeInfo = (
 ): Promise<AxiosResponse<{ data: ThemeInfo }>> =>
   api.get(`/themes/${themeId}/info`);
 
-export const getThemeProductById = (themeId: string) =>
+export const getThemeProductByThemeId = (themeId: string) =>
   api.get(`/themes/${themeId}/products `);
 
 export const getTheme = () => api.get(THEMES);

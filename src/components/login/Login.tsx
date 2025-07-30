@@ -14,7 +14,7 @@ const Login = () => {
   const { setUser } = useUserInfo();
   const theme = useTheme();
   const navigate = useNavigate();
-  const { MYPAGE } = ROUTE_PATHS;
+  const { MAIN } = ROUTE_PATHS;
 
   const validateEmail = (email: string) => {
     const EMAIL_REGEXP = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -48,7 +48,7 @@ const Login = () => {
         JSON.stringify(logUserInfo)
       );
 
-      navigate(MYPAGE);
+      navigate(MAIN);
     },
   });
 

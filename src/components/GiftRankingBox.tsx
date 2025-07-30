@@ -4,7 +4,7 @@ import GiftObject from "./GiftObject";
 import { useTheme } from "@emotion/react";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { getProductsFiltered } from "@/api/gift/gift";
 
 type GiftRankingProps = {
@@ -21,10 +21,10 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
     data: productRankingData,
     isError,
     isLoading,
-  } = useQuery({
+  } = useSuspenseQuery({
     queryKey: ["productRanking", target, rankType],
     queryFn: () => getProductsFiltered(productsFiltered),
-    enabled: !!target && !!rankType,
+    // enabled: !!target && !!rankType,
     select: (data) => data.data.data,
   });
 
@@ -43,7 +43,7 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
               <GiftObject
                 key={product.id}
                 gift={product}
-                onClick={() => navigate(`/order/${product.id}`)}
+                onClick={() => navigate(`/product/${product.id}`)}
               />
             ))}
         </>
