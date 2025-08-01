@@ -24,7 +24,6 @@ const GiftRanking = ({ target, rankType }: GiftRankingProps) => {
   } = useSuspenseQuery({
     queryKey: ["productRanking", target, rankType],
     queryFn: () => getProductsFiltered(productsFiltered),
-    // enabled: !!target && !!rankType,
     select: (data) => data.data.data,
   });
 
