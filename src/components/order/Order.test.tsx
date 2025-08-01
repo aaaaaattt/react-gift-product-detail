@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { Suspense } from "react";
@@ -40,10 +40,7 @@ const setup = () => {
 };
 
 describe("Order 컴포넌트 테스트", () => {
-  // 👇 beforeEach 블록을 추가합니다.
   beforeEach(() => {
-    // 이 describe 블록의 모든 테스트가 실행되기 전에
-    // 항상 성공적인 API 응답을 모의 처리합니다.
     const mockProductData = {
       name: "테스트 상품",
       brandName: "테스트 브랜드",
